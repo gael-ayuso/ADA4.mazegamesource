@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.Objects;
 
 import src.main.gui.elements.MapElements;
 import src.main.gui.elements.MazeObject;
@@ -226,7 +225,7 @@ public class GameGui extends JFrame implements ActionListener {
     public void nextLevelLoad() {
         levelNum += 1;
         catFileName = levelNum;
-        tk.TimeKeeper(timeLeft, ix);//The src.main.TimeKeeper object keeps a running tab of the total time the player has used.(for high score)
+        tk.timeTracker(timeLeft, ix);//The src.main.TimeKeeper object keeps a running tab of the total time the player has used.(for high score)
         timely.stop();//dont count while we are loading the next level.
         theArc = new TheArchitect();//flush everything from src.main.TheArchitect so we dont get goffee results
 

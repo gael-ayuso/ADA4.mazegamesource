@@ -5,7 +5,7 @@ import java.time.Duration;
 public class TimeKeeper {
     Duration duration = Duration.ZERO;
 
-    public void TimeKeeper(int min, int sec)//a class to keep track of the total seconds and minuntes the player has used to get to a level
+    public void timeTracker(int min, int sec)//a class to keep track of the total seconds and minuntes the player has used to get to a level
     {
         duration = duration.plusMinutes(min).plusSeconds(sec);
     }//end src.main.TimeKeeper
