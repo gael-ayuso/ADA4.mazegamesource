@@ -3,7 +3,7 @@ package src.main;
 import java.time.Duration;
 
 public class TimeKeeper {
-    Duration duration;
+    Duration duration = Duration.ZERO;
 
     public void TimeKeeper(int min, int sec)//a class to keep track of the total seconds and minuntes the player has used to get to a level
     {
