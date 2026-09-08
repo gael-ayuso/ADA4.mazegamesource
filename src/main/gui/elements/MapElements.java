@@ -1,7 +1,7 @@
 package src.main.gui.elements;
 
 public enum MapElements {
-    EMPTY( '.', "empty.png"),
+    EMPTY( 'N', "empty.png"),
     WALL( 'W', "wall.png"),
     PLAYER( 'P', "player.png"),
     DIAMOND( 'D', "diamond.png"),

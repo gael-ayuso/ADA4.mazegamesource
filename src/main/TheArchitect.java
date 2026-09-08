@@ -27,7 +27,6 @@ public class TheArchitect extends JFrame {
     public void playerMove(int xScale, int yScale, String[][] currentMatrix, int totalDimonds) throws StupidAssMove {
         int x = 0;
         int y = 0;
-        int found = 0;
         globalTotalDimonds = totalDimonds; //use this later for the gui dimond count
         nextLevel(false); //dont go to the next level yet.
         String[][] junkMatrix = currentMatrix;//we will be updating currentMatrix
@@ -38,7 +37,6 @@ public class TheArchitect extends JFrame {
                 {
                     x = i;//record the players position
                     y = j;
-                    found = 1;
                     break;
                 }
             }

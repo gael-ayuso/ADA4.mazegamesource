@@ -1,12 +1,14 @@
 package src.main;
 
+import src.main.gui.elements.MapElements;
+
 import java.io.*;
 import javax.swing.*;
 
 public class FileLoader {
     private int exitXCord = 0;
     private int exitYCord = 0;
-    private String[][] GameMatrix;
+    private char [][] GameMatrix;
     private int column;
     private int row;
 
@@ -43,30 +45,30 @@ public class FileLoader {
             String r1 = fileTextLine.substring(locationOfSpace + sum);//see above
             column = Integer.parseInt(c1);
             row = Integer.parseInt(r1);
-            GameMatrix = new String[row][column];//create new matrix based on the size from the file
+            GameMatrix = new char[row][column];//create new matrix based on the size from the file
         }//end if
         else
             for (int i = 0; i < fileTextLine.length(); i++)//it is not the first line of the maze file
             {
                 textVar = fileTextLine.charAt(i); //grab the individual charaters from the string.
                 if (textVar == '.')//change . to N, so we dont have any goofy file system problems
-                    textVar = 'N';
-                String textVar1 = "" + textVar;
-                if (textVar == 'E')//log the position of the exit for later use
+                    textVar = MapElements.EMPTY.getSymbol();
+                if (textVar == MapElements.EXIT.getSymbol())//log the position of the exit for later use
                 {
 
                     exitXCord = lineNum - 1;
                     exitYCord = i;
                     // textVar='W';
-                    textVar1 = "" + textVar;//turn the exit into a wall
+//                    textVar1 = "" + textVar;//turn the exit into a wall
+                    textVar = MapElements.WALL.getSymbol();
                 }
-                GameMatrix[lineNum - 1][i] = textVar1; //load the matrix with values, aka N,W, D, H, etc
+                GameMatrix[lineNum - 1][i] = textVar; //load the matrix with values, aka N,W, D, H, etc
             }//end for loop
 
 
     }//end matrixloader method
 
-    public String[][] getGameMatrix() {
+    public char[][] getGameMatrix() {
         if (GameMatrix == null) {
             return null;
         }
@@ -76,9 +78,9 @@ public class FileLoader {
         int playerCount = 0;
         for (int i = 0; i < GameMatrix.length; i++) {
             for (int j = 0; j < GameMatrix[i].length; j++) {
-                if (GameMatrix[i][j].equals("P")) {
+                if (GameMatrix[i][j] == MapElements.PLAYER.getSymbol()) {
                     playerCount += 1;
-                } else if (GameMatrix[i][j].equals("E")) {
+                } else if (GameMatrix[i][j] == MapElements.EXIT.getSymbol()) {
                     exitCount += 1;
                     i1 = i;
                     j1 = j;
@@ -88,7 +90,7 @@ public class FileLoader {
         if (playerCount > 1 || exitCount > 1) {
             throw new gameFileError();
         } else if (exitCount == 1) {
-            GameMatrix[i1][j1] = "W";
+            GameMatrix[i1][j1] = MapElements.WALL.getSymbol();
         }
 
         return GameMatrix;
@@ -119,7 +121,7 @@ public class FileLoader {
         int totalDimonds = 0;
         for (int i = 0; i < GameMatrix.length; i++) {
             for (int j = 0; j < GameMatrix[i].length; j++) {
-                if (GameMatrix[i][j].equals("D") || GameMatrix[i][j].equals("H"))
+                if (GameMatrix[i][j] == MapElements.DIAMOND.getSymbol() || GameMatrix[i][j] == MapElements.HIDDEN_DIAMOND.getSymbol())
                     totalDimonds += 1;
             }
         }//end double for loop

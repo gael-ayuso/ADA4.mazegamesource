@@ -14,11 +14,7 @@ public class GameGui extends JFrame implements ActionListener {
     private int catFileName = 1;
     private final Container cp;
     private final FileLoader fl = new FileLoader();
-    //create menu items
-    private final JMenuBar menuBar;
-    private final JMenu newMenu;
-    private final JMenuItem itemExit;
-    private final JMenuItem newGameItem;    Action updateCursorAction = new AbstractAction() {
+    Action updateCursorAction = new AbstractAction() {
         public void actionPerformed(ActionEvent e) throws SlowAssPlayer //this inner class generates an exeption if the player takes to long to finish a level
         {
             ix -= 1;
@@ -46,10 +42,6 @@ public class GameGui extends JFrame implements ActionListener {
             progressBar.setString(timeLeft + ":" + ix);
         }//end actionPerformed
     };//end class
-    private final JMenuItem openFileItem;
-    private final JMenuItem itemEnterName;
-    private final JMenuItem itemHighScore;
-    private final JMenuItem itemSaveScore;
     //end create menu items
     private final JLabel shagLabel;
     private int ix;
@@ -57,7 +49,6 @@ public class GameGui extends JFrame implements ActionListener {
     private int timeLeft;
     private JPanel progBarPanel;
     private MazeObject[][] labelMatrix;
-    private TimeCalculator timeCalc;
     private JProgressBar progressBar;
     private JPanel newPanel;// = new JPanel();
     private TheArchitect theArc = new TheArchitect();
@@ -73,16 +64,16 @@ public class GameGui extends JFrame implements ActionListener {
         shagLabel = new JLabel("", new ImageIcon("src/resources/assets/yeababyyea.jpg"), JLabel.LEFT);//GUI background for initial load
         cp.add(shagLabel);
         //Add Exit & New Game Menu Items
-        itemExit = new JMenuItem("Exit");
+        JMenuItem itemExit = new JMenuItem("Exit");
         itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK));//press CTRL+X to exit if you want
-        itemSaveScore = new JMenuItem("Save High Score");
+        JMenuItem itemSaveScore = new JMenuItem("Save High Score");
         itemSaveScore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));//press CTRL+S to save high score if you want
-        itemHighScore = new JMenuItem("High Score");
+        JMenuItem itemHighScore = new JMenuItem("High Score");
         itemHighScore.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK));//press CTRL+H to view high score if you want
-        itemEnterName = new JMenuItem("Enter Player Name");
+        JMenuItem itemEnterName = new JMenuItem("Enter Player Name");
         itemEnterName.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));//press CTRL+N to enter your name if you want
-        newGameItem = new JMenuItem("New Game");
-        openFileItem = new JMenuItem("Open Maze File.");
+        JMenuItem newGameItem = new JMenuItem("New Game");
+        JMenuItem openFileItem = new JMenuItem("Open Maze File.");
         openFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));//press CTRL+O to open a level if you want
         newGameItem.setActionCommand("New Game");
         newGameItem.addActionListener(this);
@@ -96,7 +87,7 @@ public class GameGui extends JFrame implements ActionListener {
         itemExit.addActionListener(this);
         openFileItem.setActionCommand("Open");
         openFileItem.addActionListener(this);
-        newMenu = new JMenu("File");
+        JMenu newMenu = new JMenu("File");
         newMenu.add(newGameItem);
         newMenu.add(itemEnterName);
         newMenu.add(openFileItem);
@@ -106,7 +97,8 @@ public class GameGui extends JFrame implements ActionListener {
 
         //Add Exit Menu Item
         //Add Menu Bar
-        menuBar = new JMenuBar();
+        //create menu items
+        JMenuBar menuBar = new JMenuBar();
         menuBar.add(newMenu);
         setJMenuBar(menuBar);
         //Add Menu Bar
@@ -122,45 +114,56 @@ public class GameGui extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Exit"))//exit on the menu bar
-        {
-            new Timer(1000, updateCursorAction).stop();
-            System.exit(0); //exit the system.
-        } else if (e.getActionCommand().equals("New Game"))//new game on the menu bar
-        {
-            //maybe implent this feature later
-        }//end New Game Command
-        else if (e.getActionCommand().equals("EnterName"))//Allows user to enter their name for high score
-        {
-            JOptionPane optionPane = new JOptionPane();
-            playerName = JOptionPane.showInputDialog("Please Enter your Earth Name");
-        } else if (e.getActionCommand().equals("src.main.HighScore"))//Displays the high scores
-        {
-            ScoreGui sg = new ScoreGui();
-            sg.ScoreGui();
-        } else if (e.getActionCommand().equals("SaveScore"))//allows the user to save their score at any time.
-        {
-            hs.addHighScore(playerName, tk.getMinutes(), tk.getSeconds(), levelNum);
-        } else if (e.getActionCommand().equals("Open"))//to start the game you have to open a maze file. this is on the menu
-        {
-            JFileChooser chooser = new JFileChooser(".");
-            int returnVal = chooser.showOpenDialog(this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = chooser.getSelectedFile();
-                currentLevelDirectory = selectedFile.getParentFile();
+        switch (e.getActionCommand()) {
+            case "Exit" -> {
+//exit on the menu bar
 
-                // Extraer el número de nivel desde el nombre (ej. "level5.maz" -> 5)
-                String numericPart = selectedFile.getName().replaceAll("\\D+", "");
-                if (!numericPart.isEmpty()) {
-                    levelNum = Integer.parseInt(numericPart);
-                } else {
-                    levelNum = 1;
-                }
-                catFileName = levelNum;
+                new Timer(1000, updateCursorAction).stop();
+                System.exit(0); //exit the system.
+            }
+            case "New Game" -> {
+//new game on the menu bar
 
-                if (fl.loadFile(selectedFile.getAbsolutePath())) {//load the file we need using absolute path
-                    theArc.setExit(fl.ExitXCord(), fl.ExitYCord());
-                    loadMatrixGui(GuiEvents.NEW_LOAD);
+                //maybe implent this feature later
+            }
+            case "EnterName" -> {
+//Allows user to enter their name for high score
+
+                JOptionPane optionPane = new JOptionPane();
+                playerName = JOptionPane.showInputDialog("Please Enter your Earth Name");
+            }
+            case "src.main.HighScore" -> {
+//Displays the high scores
+
+                ScoreGui sg = new ScoreGui();
+                sg.ScoreGui();
+            }
+            case "SaveScore" ->
+//allows the user to save their score at any time.
+
+                    hs.addHighScore(playerName, tk.getMinutes(), tk.getSeconds(), levelNum);
+            case "Open" -> {
+//to start the game you have to open a maze file. this is on the menu
+
+                JFileChooser chooser = new JFileChooser(".");
+                int returnVal = chooser.showOpenDialog(this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = chooser.getSelectedFile();
+                    currentLevelDirectory = selectedFile.getParentFile();
+
+                    // Extraer el número de nivel desde el nombre (ej. "level5.maz" -> 5)
+                    String numericPart = selectedFile.getName().replaceAll("\\D+", "");
+                    if (!numericPart.isEmpty()) {
+                        levelNum = Integer.parseInt(numericPart);
+                    } else {
+                        levelNum = 1;
+                    }
+                    catFileName = levelNum;
+
+                    if (fl.loadFile(selectedFile.getAbsolutePath())) {//load the file we need using absolute path
+                        theArc.setExit(fl.ExitXCord(), fl.ExitYCord());
+                        loadMatrixGui(GuiEvents.NEW_LOAD);
+                    }
                 }
             }
         }
@@ -171,7 +174,7 @@ public class GameGui extends JFrame implements ActionListener {
             remove(newPanel);//remove the previous level's game from the screen
             if (progBarPanel != null)//remove the progress bar from the gui as long as its already been created.
                 remove(progBarPanel);
-            String[][] temp = fl.getGameMatrix();
+            char[][] temp = fl.getGameMatrix();
             if (temp == null) {
                 return;
             }
@@ -180,7 +183,7 @@ public class GameGui extends JFrame implements ActionListener {
                 //create a new matrix so we dont have a refrence to another objects matrix!
                 System.arraycopy(temp[i], 0, scrapMatrix[i], 0, scrapMatrix[i].length);
             }//end double for loop
-            timeCalc = new TimeCalculator();//create the time calculator used to determine how much time each level is given.
+            TimeCalculator timeCalc = new TimeCalculator();//create the time calculator used to determine how much time each level is given.
             timeCalc.calcTimeforMaze(fl.dimondCount(), fl.getMatrixSizeRow(), fl.getMatrixSizeColumn());//let time calculator know the parameters of the game
             timeLeft = timeCalc.getMinutes();//get the minutes allowed for the level
             ix = timeCalc.getSeconds();//get the seconds allowed for the level;

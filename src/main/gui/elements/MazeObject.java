@@ -12,8 +12,6 @@ public class MazeObject extends JLabel {
     private static void loadIcons() {
         for (MapElements element : MapElements.values()) {
             URL url = MazeObject.class.getResource("/src/resources/assets/" + element.getFileName());
-            System.out.println(url);
-
             if (url != null) {
                 ICONS.put(element, new ImageIcon(url));
             } else {

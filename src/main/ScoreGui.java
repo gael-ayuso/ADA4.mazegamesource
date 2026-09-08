@@ -7,8 +7,6 @@ import java.io.*;
 
 public class ScoreGui extends JDialog implements ActionListener {
 
-    private JLabel mainLabel;
-
     public ScoreGui() {
         super();
     }
@@ -52,7 +50,7 @@ public class ScoreGui extends JDialog implements ActionListener {
                     scorePanel.setLayout(new GridLayout(recordsCount, recordsCount));
                     for (int i = 0; i < myScoreArray.length; i++) {
                         if (myScoreArray[i] != " ") {
-                            mainLabel = new JLabel(myScoreArray[i], JLabel.LEFT);//display the score on the screen
+                            JLabel mainLabel = new JLabel(myScoreArray[i], JLabel.LEFT);//display the score on the screen
                             scorePanel.add(mainLabel);
                         }
                     }//end for loop
