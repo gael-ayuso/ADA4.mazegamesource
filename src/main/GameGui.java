@@ -29,7 +29,7 @@ public class GameGui extends JFrame implements ActionListener {
             }
             if (timeLeft == 0 && ix == 0) {
                 timely.stop();
-                JLabel yousuckLabel = new JLabel("", new ImageIcon("src/resources/yousuck.jpg"), JLabel.LEFT);
+                JLabel yousuckLabel = new JLabel("", new ImageIcon("src/resources/assets/yousuck.jpg"), JLabel.LEFT);
                 cp.add(yousuckLabel);
                 remove(newPanel);
                 remove(progBarPanel);
@@ -70,7 +70,7 @@ public class GameGui extends JFrame implements ActionListener {
     public GameGui() {
         super("Maze, a game of wondering"); //call super to initilize title bar of G.U.I.
         cp = getContentPane();
-        shagLabel = new JLabel("", new ImageIcon("src/resources/yeababyyea.jpg"), JLabel.LEFT);//GUI background for initial load
+        shagLabel = new JLabel("", new ImageIcon("src/resources/assets/yeababyyea.jpg"), JLabel.LEFT);//GUI background for initial load
         cp.add(shagLabel);
         //Add Exit & New Game Menu Items
         itemExit = new JMenuItem("Exit");
