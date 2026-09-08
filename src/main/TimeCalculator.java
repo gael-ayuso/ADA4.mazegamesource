@@ -3,8 +3,6 @@ package src.main;
 import java.time.Duration;
 
 public class TimeCalculator {
-    int minutes = 0;
-    int seconds = 0;
     private Duration duration = Duration.ZERO;
 
     public void calcTimeforMaze(int totalDimonds, int xSize, int ySize)//some kinda method that determines the time a player has for each level based on the level size and dimonds.
@@ -14,12 +12,12 @@ public class TimeCalculator {
             duration = duration.plusMinutes((ySize / xSize) + 1);
         } else
             duration = duration.plusMinutes((ySize / xSize) + 1);
-        if (totalDimonds > 6 && totalDimonds * .10 + seconds <= 60){
+        if (totalDimonds > 6 && totalDimonds * .10 + duration.toSecondsPart() <= 60){
             duration = duration.plusMinutes((ySize / xSize) + 1);
         } else {
             duration = duration.plusMinutes(1);
         }
-        if (minutes == 0){
+        if (duration.toMinutesPart() == 0){
             duration = Duration.ofMinutes(2);
         }
     }//end method
