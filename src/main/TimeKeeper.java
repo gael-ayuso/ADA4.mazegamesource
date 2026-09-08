@@ -1,26 +1,20 @@
 package src.main;
 
+import java.time.Duration;
+
 public class TimeKeeper {
-    int minutes = 0;
-    int seconds = 0;
+    Duration duration;
 
     public void TimeKeeper(int min, int sec)//a class to keep track of the total seconds and minuntes the player has used to get to a level
     {
-        if (sec + seconds <= 60) {
-            minutes += min;
-            seconds = sec + seconds;
-        } else {
-            minutes += min;
-            minutes += ((sec + seconds) / 60);
-            seconds = (sec + seconds) % 60;
-        }
+        duration = duration.plusMinutes(min).plusSeconds(sec);
     }//end src.main.TimeKeeper
 
     public int getMinutes() {
-        return minutes;
+        return duration.toMinutesPart();
     }
 
     public int getSeconds() {
-        return seconds;
+        return duration.toSecondsPart();
     }
 }//end class

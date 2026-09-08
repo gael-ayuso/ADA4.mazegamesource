@@ -10,19 +10,20 @@ public class FileLoader {
     private int column;
     private int row;
 
-    public void loadFile(String fileName) {
-        try {
-            BufferedReader in = new BufferedReader(new FileReader(fileName));
+    public boolean loadFile(String fileName) {
+        try (BufferedReader in = new BufferedReader(new FileReader(fileName))) {
             String x;
             int lineNum = 0;
             while ((x = in.readLine()) != null) {
                 MatrixLoader(x, lineNum);//pass the Matrix loader method the line and the line number for parsing.
                 lineNum++;//we will use the line number later in this class
             }
+            return true;
         }//end try
         catch (IOException e) {
             JFrame frame = new JFrame("Alert");
             JOptionPane.showMessageDialog(frame, "Ooops IOException error, i did it again!" + e.getMessage());
+            return false;
         }//end catch
     }//end load file method
 
@@ -66,34 +67,29 @@ public class FileLoader {
     }//end matrixloader method
 
     public String[][] getGameMatrix() {
+        if (GameMatrix == null) {
+            return null;
+        }
         int exitCount = 0;
         int i1 = 0;
         int j1 = 0;
-        //  playerCount=0;//we must reset our variables to zero for the next level.
-        //before we will return the matrix we will quick do some error checking
         int playerCount = 0;
         for (int i = 0; i < GameMatrix.length; i++) {
             for (int j = 0; j < GameMatrix[i].length; j++) {
                 if (GameMatrix[i][j].equals("P")) {
                     playerCount += 1;
-
                 } else if (GameMatrix[i][j].equals("E")) {
                     exitCount += 1;
                     i1 = i;
                     j1 = j;
                 }
-                System.out.println(playerCount + "playerCount");
-                System.out.println(exitCount + "playerCount");
-
             }
         }//end double for loop
         if (playerCount > 1 || exitCount > 1) {
-            // playerCount=0;//we must reset our variables to zero for the next level.
-            // exitCount=0;//we must reset our variables to zero for the next level.
             throw new gameFileError();
-        } else
+        } else if (exitCount == 1) {
             GameMatrix[i1][j1] = "W";
-
+        }
 
         return GameMatrix;
     }//end getGameMatrix method
