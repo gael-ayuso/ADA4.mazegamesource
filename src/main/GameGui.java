@@ -17,34 +17,29 @@ public class GameGui extends JFrame {
     final FileLoader fl = new FileLoader(); //se le quito el private
 
     Action updateCursorAction = new AbstractAction() {
-        public void actionPerformed(ActionEvent e) throws SlowAssPlayer //this inner class generates an exeption if the player takes to long to finish a level
-        {
+        public void actionPerformed(ActionEvent e) {
             ix -= 1;
             jx += 1;
             if (ix < 0) {
                 ix = 60;
                 timeLeft -= 1;
             }
-            if (timeLeft == 0 && ix == 0) {
-                timely.stop();
-                JLabel yousuckLabel = new JLabel("", new ImageIcon("src/resources/assets/yousuck.jpg"), JLabel.LEFT);
-                cp.add(yousuckLabel);
-                remove(newPanel);
-                remove(progBarPanel);
-                pack();
-                setVisible(true);
+            if (timeLeft <= 0 && ix <= 0) {
                 timely.stop();
                 catFileName -= 1;
-                if (catFileName < 1)
-                    throw new SlowAssPlayer("Slow ass took to long.");
-                else
+                if (catFileName < 1) {
+                    handleTimeExpired();
+                } else {
                     loadMatrixGui(GuiEvents.NEW_LOAD);
-            }//end first if
+                }
+                return;
+            }
             progressBar.setValue(jx);
             progressBar.setString(timeLeft + ":" + ix);
         }//end actionPerformed
-    };//end class
+    }; //end class
     //end create menu items
+
     private final JLabel shagLabel;
     private int ix;
     private int jx;
@@ -126,6 +121,24 @@ public class GameGui extends JFrame {
         pack();
         setVisible(true);//show our menu bar and shagLabel.. Yea baby Yea! Whoa.. to much java.
     }//end constructor
+
+    private void handleTimeExpired() {
+        timely.stop();
+        //the game is over, here we must tell our high score method to recond the details.
+        highScore.addHighScore(playerName, timeKeeper.getMinutes(), timeKeeper.getSeconds(), levelNum);
+
+        remove(newPanel);
+        if (progBarPanel != null) {
+            remove(progBarPanel);
+        }
+        JLabel yousuckLabel = new JLabel("", new ImageIcon("src/resources/assets/yousuck.jpg"), JLabel.LEFT);
+        cp.add(yousuckLabel);
+        pack();
+        setVisible(true);
+
+        JFrame frame = new JFrame("Warning");
+        JOptionPane.showMessageDialog(frame, "You Stupid Ass, Did you eat to much for dinner?  Move Faster!");//the entire game has ended.
+    }
 
     public static void main(String[] args) {
         new GameGui();
@@ -260,13 +273,5 @@ public class GameGui extends JFrame {
         }//end method
     }//end inner class
 
-    private class SlowAssPlayer extends RuntimeException {
-        public SlowAssPlayer(String event) {
-            //the game is over, here we must tell our high score method to recond the details.
-            highScore.addHighScore(playerName, timeKeeper.getMinutes(), timeKeeper.getSeconds(), levelNum);
-            JFrame frame = new JFrame("Warning");
-            JOptionPane.showMessageDialog(frame, "You Stupid Ass, Did you eat to much for dinner?  Move Faster!");//the entire game has ended.
-        }
-    }//end class
 
 }//end class    
