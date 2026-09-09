@@ -24,7 +24,7 @@ public class TheArchitect extends JFrame {
         updatedMatrix[WallXCord][WallYCord] = "E";
     }
 
-    public void playerMove(int xScale, int yScale, String[][] currentMatrix, int totalDimonds) throws StupidAssMove {
+    public void playerMove(int xScale, int yScale, String[][] currentMatrix, int totalDimonds) {
         int x = 0;
         int y = 0;
         globalTotalDimonds = totalDimonds; //use this later for the gui dimond count
@@ -66,8 +66,11 @@ public class TheArchitect extends JFrame {
             currentMatrix[x][y] = "N";
             currentMatrix[x + xScale][y + yScale] = "P";
             nextLevel(true);//allow the next level to be loaded.
-        } else
-            throw new StupidAssMove("Ass Hole hit wall!");
+        } else {
+            // Ass Hole hit wall!
+            JFrame frame = new JFrame("Warning");
+            JOptionPane.showMessageDialog(frame, "You Stupid Ass, Ran into something did you?");
+        }
 
         if (collected == totalDimonds)//if we have all the dimonds give the player the exit
             showWall();
@@ -94,10 +97,4 @@ public class TheArchitect extends JFrame {
         return updatedMatrix;
     }
 
-    private class StupidAssMove extends RuntimeException {
-        public StupidAssMove(String event) {
-            JFrame frame = new JFrame("Warning");
-            JOptionPane.showMessageDialog(frame, "You Stupid Ass, Ran into something did you?");
-        }
-    }//end inner class
 }//end class
