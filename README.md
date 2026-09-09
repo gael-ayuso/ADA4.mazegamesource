@@ -20,3 +20,8 @@ Eficiencia
 
 ## 6
 Se retiró la interfaz `ActionListener` de `GameGui` y se pasó lo de `actionPerformed` hacia la nueva clase `MenuController`.SRP
+
+# 7
+Eliminación del control de flujo por excepciones (`SlowAssPlayer`) el cual se utilizaba para controlar el flujo del juego al agotarse el tiempo. Se reemplazó por el método `handleTimeExpired()` invocado desde la acción del temporizador (`updateCursorAction`). 
+Mantenibilidad
+
