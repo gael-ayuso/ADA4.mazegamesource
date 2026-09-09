@@ -1,4 +1,9 @@
-package src.main;
+package src.main.controllers;
+
+import src.main.GameGui;
+import src.main.GuiEvents;
+import src.main.ScoreGui;
+import src.main.TheArchitect;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -42,8 +47,8 @@ public class MenuController implements ActionListener {
                 File level1File = new File("src/resources/levels/level1.maz");
                 gameGui.currentLevelDirectory = level1File.getParentFile();
 
-                if (level1File.exists() && gameGui.fl.loadFile(level1File.getAbsolutePath())) {
-                    gameGui.theArc.setExit(gameGui.fl.ExitXCord(), gameGui.fl.ExitYCord());
+                if (level1File.exists() && gameGui.fileLoader.loadFile(level1File.getAbsolutePath())) {
+                    gameGui.theArc.setExit(gameGui.fileLoader.ExitXCord(), gameGui.fileLoader.ExitYCord());
                     gameGui.loadMatrixGui(GuiEvents.NEW_LOAD);
                 } else {
                     JOptionPane.showMessageDialog(
@@ -90,8 +95,8 @@ public class MenuController implements ActionListener {
                     }
                     gameGui.catFileName = gameGui.levelNum;
 
-                    if (gameGui.fl.loadFile(selectedFile.getAbsolutePath())) {//load the file we need using absolute path
-                        gameGui.theArc.setExit(gameGui.fl.ExitXCord(), gameGui.fl.ExitYCord());
+                    if (gameGui.fileLoader.loadFile(selectedFile.getAbsolutePath())) {//load the file we need using absolute path
+                        gameGui.theArc.setExit(gameGui.fileLoader.ExitXCord(), gameGui.fileLoader.ExitYCord());
                         gameGui.loadMatrixGui(GuiEvents.NEW_LOAD);
                     }
                 }

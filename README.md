@@ -21,7 +21,12 @@ Eficiencia
 ## 6
 Se retiró la interfaz `ActionListener` de `GameGui` y se pasó lo de `actionPerformed` hacia la nueva clase `MenuController`.SRP
 
-# 7
-Eliminación del control de flujo por excepciones (`SlowAssPlayer`) el cual se utilizaba para controlar el flujo del juego al agotarse el tiempo. Se reemplazó por el método `handleTimeExpired()` invocado desde la acción del temporizador (`updateCursorAction`). 
+## 7
+Eliminación del control de flujo por excepciones (`SlowAssPlayer`).
+Se reemplazó por el método `handleTimeExpired()` invocado desde la acción del temporizador (`updateCursorAction`). 
 Mantenibilidad
 
+## 8
+Creación del paquete `src.main.controllers` y desacoplamiento de eventos del teclado en `MovementController.java`.
+Se extrajo la clase `MyKeyHandler` de `GameGui` hacia `MovementController`, esta asume la responsabilidad del movimiento del jugador.
+Mantenibilidad y Separación de Responsabilidades

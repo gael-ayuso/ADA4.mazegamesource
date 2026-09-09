@@ -5,16 +5,18 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+import src.main.controllers.MenuController;
+import src.main.controllers.MovementController;
 import src.main.gui.elements.MapElements;
 import src.main.gui.elements.MazeObject;
 
 // ANTES: public class GameGui extends JFrame implements ActionListener
 public class GameGui extends JFrame {
 
-    final HighScore highScore; //se le quito el private
-    int catFileName = 1; //se le quito el private
+    public final HighScore highScore; //se le quito el private
+    public int catFileName = 1; //se le quito el private
     private final Container cp;
-    final FileLoader fl = new FileLoader(); //se le quito el private
+    public final FileLoader fileLoader = new FileLoader(); //se le quito el private
 
     Action updateCursorAction = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -48,14 +50,14 @@ public class GameGui extends JFrame {
     private MazeObject[][] labelMatrix;
     private JProgressBar progressBar;
     private JPanel newPanel;// = new JPanel();
-    TheArchitect theArc = new TheArchitect(); //se le quito el private
-    private String[][] scrapMatrix;
-    Timer timely; //se le quito el private
-    final TimeKeeper timeKeeper; //se le quito el private
-    String playerName; //se le quito el private
-    int levelNum = 1; //se le quito el private
-    File currentLevelDirectory; //se le quito el private
-    private JLabel diamondsLabel;
+    public TheArchitect theArc = new TheArchitect(); //se le quito el private
+    public String[][] scrapMatrix;
+    public Timer timely; //se le quito el private
+    public final TimeKeeper timeKeeper; //se le quito el private
+    public String playerName; //se le quito el private
+    public int levelNum = 1; //se le quito el private
+    public File currentLevelDirectory; //se le quito el private
+    public JLabel diamondsLabel;
 
     public GameGui() {
         super("Maze, a game of wondering"); //call super to initilize title bar of G.U.I.
@@ -150,11 +152,11 @@ public class GameGui extends JFrame {
             remove(newPanel);//remove the previous level's game from the screen
             if (progBarPanel != null)//remove the progress bar from the gui as long as its already been created.
                 remove(progBarPanel);
-            char[][] temp = fl.getGameMatrix();
+            char[][] temp = fileLoader.getGameMatrix();
             if (temp == null) {
                 return;
             }
-            scrapMatrix = new String[fl.getMatrixSizeRow()][fl.getMatrixSizeColumn()];
+            scrapMatrix = new String[fileLoader.getMatrixSizeRow()][fileLoader.getMatrixSizeColumn()];
             for (int i = 0; i < scrapMatrix.length; i++) {
                 //create a new matrix so we dont have a refrence to another objects matrix!
                 for (int j = 0; j < scrapMatrix[i].length; j++) {
@@ -162,7 +164,7 @@ public class GameGui extends JFrame {
                 }
             }//end double for loop
             TimeCalculator timeCalc = new TimeCalculator();//create the time calculator used to determine how much time each level is given.
-            timeCalc.calcTimeforMaze(fl.dimondCount(), fl.getMatrixSizeRow(), fl.getMatrixSizeColumn());//let time calculator know the parameters of the game
+            timeCalc.calcTimeforMaze(fileLoader.dimondCount(), fileLoader.getMatrixSizeRow(), fileLoader.getMatrixSizeColumn());//let time calculator know the parameters of the game
             timeLeft = timeCalc.getMinutes();//get the minutes allowed for the level
             ix = timeCalc.getSeconds();//get the seconds allowed for the level;
             jx = 0;//reset the variable used for keeping time to zero since its a new level
@@ -174,8 +176,8 @@ public class GameGui extends JFrame {
             progBarPanel.add(progressBar);
             cp.add(progBarPanel, BorderLayout.NORTH);
             newPanel = new JPanel();
-            newPanel.setLayout(new GridLayout(fl.getMatrixSizeRow(), fl.getMatrixSizeColumn()));//set our panel for the game to the size of the matrix
-            labelMatrix = new MazeObject[fl.getMatrixSizeRow()][fl.getMatrixSizeColumn()];
+            newPanel.setLayout(new GridLayout(fileLoader.getMatrixSizeRow(), fileLoader.getMatrixSizeColumn()));//set our panel for the game to the size of the matrix
+            labelMatrix = new MazeObject[fileLoader.getMatrixSizeRow()][fileLoader.getMatrixSizeColumn()];
             for (int i = 0; i < labelMatrix.length; i++) {
                 for (int j = 0; j < labelMatrix[i].length; j++) {
                     MapElements element = MapElements.getMapElementFromChar(scrapMatrix[i][j].charAt(0));
@@ -183,7 +185,7 @@ public class GameGui extends JFrame {
                     newPanel.add(labelMatrix[i][j]);//add our maze images into the gui
                 }
             }
-            newPanel.addKeyListener(new MyKeyHandler());
+            newPanel.addKeyListener(new MovementController(this));
             cp.add(newPanel);
             remove(shagLabel);//remove the constructors initial background
             pack();
@@ -214,8 +216,8 @@ public class GameGui extends JFrame {
                 ? new File(currentLevelDirectory, nextFileName) 
                 : new File(nextFileName);
 
-        if (fl.loadFile(nextFile.getAbsolutePath())) {//load the file we need
-            theArc.setExit(fl.ExitXCord(), fl.ExitYCord());
+        if (fileLoader.loadFile(nextFile.getAbsolutePath())) {//load the file we need
+            theArc.setExit(fileLoader.ExitXCord(), fileLoader.ExitYCord());
             loadMatrixGui(GuiEvents.NEW_LOAD);
         } else {
             // Fin de los niveles disponibles
@@ -229,49 +231,4 @@ public class GameGui extends JFrame {
             );
         }
     }
-
-    private class MyKeyHandler extends KeyAdapter //captures arrow keys movement
-    {
-        public void keyPressed(KeyEvent theEvent) {
-            switch (theEvent.getKeyCode()) {
-                case KeyEvent.VK_UP: {
-                    theArc.playerMove(-1, 0, scrapMatrix, fl.dimondCount());//let the Architect know we moved, along with the current matrix
-                    loadMatrixGui(GuiEvents.UPDATE_LOAD);//reload the gui to show the move
-                    if (theArc.getLevel()) {
-                        nextLevelLoad();//if the player hit an exit door, load the next level
-                    }
-                    break;
-                }
-                case KeyEvent.VK_DOWN: {
-                    theArc.playerMove(1, 0, scrapMatrix, fl.dimondCount());//see above
-                    loadMatrixGui(GuiEvents.UPDATE_LOAD);//see above
-                    if (theArc.getLevel())//see above
-                    {
-                        nextLevelLoad();//see above
-                    }
-                    break;
-                }
-                case KeyEvent.VK_LEFT: {
-                    theArc.playerMove(0, -1, scrapMatrix, fl.dimondCount());//see above
-                    loadMatrixGui(GuiEvents.UPDATE_LOAD);//see above
-                    if (theArc.getLevel())//see above
-                    {
-                        nextLevelLoad();//see above
-                    }
-                    break;
-                }
-                case KeyEvent.VK_RIGHT: {
-                    theArc.playerMove(0, 1, scrapMatrix, fl.dimondCount()); //see above
-                    loadMatrixGui(GuiEvents.UPDATE_LOAD);//see above
-                    if (theArc.getLevel()) {
-                        nextLevelLoad();//see above
-                    }
-                    break;
-                }
-            }//end switch
-            diamondsLabel.setText("Total Diamonds Left to Collect: " + theArc.getDimondsLeft());
-        }//end method
-    }//end inner class
-
-
 }//end class    
