@@ -122,9 +122,36 @@ public class GameGui extends JFrame implements ActionListener {
                 System.exit(0); //exit the system.
             }
             case "New Game" -> {
-//new game on the menu bar
+                /**
+                 * Se implementó la funcionalidad para que al
+                 * presionar en "New game" te abra en automatico el nivel 1
+                 * */
+                // 1. Detener el temporizador previo si ya había una partida en curso
+                if (timely != null) {
+                    timely.stop();
+                }
 
-                //maybe implent this feature later
+                // 2. Reiniciar los contadores de nivel y el estado del juego
+                levelNum = 1;
+                catFileName = 1;
+                theArc = new TheArchitect();
+
+                // 3. Cargar el nivel 1
+                File level1File = new File("src/resources/levels/level1.maz");
+                currentLevelDirectory = level1File.getParentFile();
+
+                if (level1File.exists() && fl.loadFile(level1File.getAbsolutePath())) {
+                    theArc.setExit(fl.ExitXCord(), fl.ExitYCord());
+                    loadMatrixGui(GuiEvents.NEW_LOAD);
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "No se encontró el archivo del nivel 1 en:\n" + level1File.getAbsolutePath(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+
             }
             case "EnterName" -> {
 //Allows user to enter their name for high score
@@ -143,7 +170,7 @@ public class GameGui extends JFrame implements ActionListener {
 
                     hs.addHighScore(playerName, tk.getMinutes(), tk.getSeconds(), levelNum);
             case "Open" -> {
-//to start the game you have to open a maze file. this is on the menu
+                //to start the game you have to open a maze file. this is on the menu
 
                 JFileChooser chooser = new JFileChooser(".");
                 int returnVal = chooser.showOpenDialog(this);
@@ -181,7 +208,9 @@ public class GameGui extends JFrame implements ActionListener {
             scrapMatrix = new String[fl.getMatrixSizeRow()][fl.getMatrixSizeColumn()];
             for (int i = 0; i < scrapMatrix.length; i++) {
                 //create a new matrix so we dont have a refrence to another objects matrix!
-                System.arraycopy(temp[i], 0, scrapMatrix[i], 0, scrapMatrix[i].length);
+                for (int j = 0; j < scrapMatrix[i].length; j++) {
+                    scrapMatrix[i][j] = String.valueOf(temp[i][j]);
+                }
             }//end double for loop
             TimeCalculator timeCalc = new TimeCalculator();//create the time calculator used to determine how much time each level is given.
             timeCalc.calcTimeforMaze(fl.dimondCount(), fl.getMatrixSizeRow(), fl.getMatrixSizeColumn());//let time calculator know the parameters of the game
