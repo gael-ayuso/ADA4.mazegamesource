@@ -11,3 +11,5 @@ NEW_LOAD,
 UPDATE_LOAD
 }) 
 para mejorar la lectura del codigo
+# 4
+En `GameGui.java` en el caso de **New Game** se agregó la funcionalidad de abrir el nivel 1 en automatico
