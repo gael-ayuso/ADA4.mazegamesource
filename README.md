@@ -30,3 +30,9 @@ Robustez y Mantenibilidad.
 Creación del paquete `src.main.controllers` y desacoplamiento de eventos del teclado en `MovementController.java`.
 Se extrajo la clase `MyKeyHandler` de `GameGui` hacia `MovementController`, esta asume la responsabilidad del movimiento del jugador.
 Mantenibilidad y Separación de Responsabilidades
+
+## 9
+Desacoplamiento de `MenuController` y `MovementController` respecto a `GameGui` mediante interfaces de acción.
+- **Interfaces `MenuActions` y `MovementActions`:** Se crearon interfaces específicas en `src.main.controllers` aplicando el Principio de Inversión de Dependencias (DIP) y Segregación de Interfaces (ISP). Los controladores ahora dependen únicamente de estas abstracciones y no de la clase concreta `GameGui`.
+- **Eliminación de dependencias y manipulación interna:** Se eliminó de `MenuController` y `MovementController` todo acoplamiento con `TheArchitect`, `FileLoader`, `GuiEvents`, temporizadores y componentes gráficos de Swing. Su función se limita a capturar eventos y delegar acciones.
+- **Restauración del encapsulamiento en `GameGui`:** `GameGui` implementa `MenuActions` y `MovementActions`, concentrando la ejecución de las acciones y permitiendo volver a declarar como `private` todos sus atributos internos (`theArc`, `scrapMatrix`, `fileLoader`, `timely`, `highScore`, `timeKeeper`, `levelNum`, etc.).

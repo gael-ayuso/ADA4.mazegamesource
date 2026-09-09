@@ -5,18 +5,19 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+import src.main.controllers.MenuActions;
+import src.main.controllers.MovementActions;
 import src.main.controllers.MenuController;
 import src.main.controllers.MovementController;
 import src.main.gui.elements.MapElements;
 import src.main.gui.elements.MazeObject;
 
-// ANTES: public class GameGui extends JFrame implements ActionListener
-public class GameGui extends JFrame {
+public class GameGui extends JFrame implements MenuActions, MovementActions {
 
-    public final HighScore highScore; //se le quito el private
-    public int catFileName = 1; //se le quito el private
+    private final HighScore highScore;
+    private int catFileName = 1;
     private final Container cp;
-    public final FileLoader fileLoader = new FileLoader(); //se le quito el private
+    private final FileLoader fileLoader = new FileLoader();
 
     Action updateCursorAction = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -50,14 +51,14 @@ public class GameGui extends JFrame {
     private MazeObject[][] labelMatrix;
     private JProgressBar progressBar;
     private JPanel newPanel;// = new JPanel();
-    public TheArchitect theArc = new TheArchitect(); //se le quito el private
-    public String[][] scrapMatrix;
-    public Timer timely; //se le quito el private
-    public final TimeKeeper timeKeeper; //se le quito el private
-    public String playerName; //se le quito el private
-    public int levelNum = 1; //se le quito el private
-    public File currentLevelDirectory; //se le quito el private
-    public JLabel diamondsLabel;
+    private TheArchitect theArc = new TheArchitect();
+    private String[][] scrapMatrix;
+    private Timer timely;
+    private final TimeKeeper timeKeeper;
+    private String playerName;
+    private int levelNum = 1;
+    private File currentLevelDirectory;
+    private JLabel diamondsLabel;
 
     public GameGui() {
         super("Maze, a game of wondering"); //call super to initilize title bar of G.U.I.
@@ -65,7 +66,7 @@ public class GameGui extends JFrame {
         shagLabel = new JLabel("", new ImageIcon("src/resources/assets/yeababyyea.jpg"), JLabel.LEFT);//GUI background for initial load
         cp.add(shagLabel);
 
-        // Creamos la instancia del nuevo controlador de menu
+        // Creamos la instancia del nuevo controlador de menu desacoplado
         MenuController menuController = new MenuController(this);
 
         //Add Exit & New Game Menu Items
@@ -146,6 +147,102 @@ public class GameGui extends JFrame {
         new GameGui();
     }
 
+    @Override
+    public void movePlayer(int rowDelta, int colDelta) {
+        if (scrapMatrix == null) {
+            return;
+        }
+        theArc.playerMove(rowDelta, colDelta, scrapMatrix, fileLoader.dimondCount());//let the Architect know we moved, along with the current matrix
+        loadMatrixGui(GuiEvents.UPDATE_LOAD);//reload the gui to show the move
+        if (theArc.getLevel()) {
+            nextLevelLoad();//if the player hit an exit door, load the next level
+        }
+        if (diamondsLabel != null) {
+            diamondsLabel.setText("Total Diamonds Left to Collect: " + theArc.getDimondsLeft());
+        }
+    }
+
+    @Override
+    public void exitGame() {
+        if (timely != null) {
+            timely.stop();
+        }
+        System.exit(0); //exit the system.
+    }
+
+    @Override
+    public void startNewGame() {
+        // 1. Detener el temporizador previo si ya había una partida en curso
+        if (timely != null) {
+            timely.stop();
+        }
+
+        // 2. Reiniciar los contadores de nivel y el estado del juego
+        levelNum = 1;
+        catFileName = 1;
+        theArc = new TheArchitect();
+
+        // 3. Cargar el nivel 1
+        File level1File = new File("src/resources/levels/level1.maz");
+        currentLevelDirectory = level1File.getParentFile();
+
+        if (level1File.exists() && fileLoader.loadFile(level1File.getAbsolutePath())) {
+            theArc.setExit(fileLoader.ExitXCord(), fileLoader.ExitYCord());
+            loadMatrixGui(GuiEvents.NEW_LOAD);
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se encontró el archivo del nivel 1 en:\n" + level1File.getAbsolutePath(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    @Override
+    public void enterPlayerName() {
+        playerName = JOptionPane.showInputDialog(this, "Please Enter your Earth Name");
+    }
+
+    @Override
+    public void showHighScores() {
+        ScoreGui sg = new ScoreGui();
+        sg.ScoreGui();
+    }
+
+    @Override
+    public void saveHighScore() {
+        highScore.addHighScore(
+                playerName,
+                timeKeeper.getMinutes(),
+                timeKeeper.getSeconds(),
+                levelNum
+        );
+    }
+
+    @Override
+    public void openMazeFile() {
+        JFileChooser chooser = new JFileChooser(".");
+        int returnVal = chooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            currentLevelDirectory = selectedFile.getParentFile();
+
+            // Extraer el número de nivel desde el nombre (ej. "level5.maz" -> 5)
+            String numericPart = selectedFile.getName().replaceAll("\\D+", "");
+            if (!numericPart.isEmpty()) {
+                levelNum = Integer.parseInt(numericPart);
+            } else {
+                levelNum = 1;
+            }
+            catFileName = levelNum;
+
+            if (fileLoader.loadFile(selectedFile.getAbsolutePath())) {//load the file we need using absolute path
+                theArc.setExit(fileLoader.ExitXCord(), fileLoader.ExitYCord());
+                loadMatrixGui(GuiEvents.NEW_LOAD);
+            }
+        }
+    }
 
     public void loadMatrixGui(GuiEvents event) {
         if (event == GuiEvents.NEW_LOAD) {
@@ -231,4 +328,4 @@ public class GameGui extends JFrame {
             );
         }
     }
-}//end class    
+}//end class
