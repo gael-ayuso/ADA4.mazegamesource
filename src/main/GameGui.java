@@ -253,7 +253,6 @@ public class GameGui extends JFrame implements ActionListener {
         }
     }//end loadMatrixGui method
 
-
     public void nextLevelLoad() {
         levelNum += 1;
         catFileName = levelNum;
