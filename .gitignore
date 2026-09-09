@@ -1,2 +1,18 @@
-out
-.idea
+# Salida de compilación
+out/
+bin/
+*.class
+
+# Archivos de IntelliJ IDEA
+.idea/
+*.iml
+mazegamesource.iml
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de datos locales (opcional)
+scores.txt
+*.log
+*.tmp
