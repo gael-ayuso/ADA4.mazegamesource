@@ -8,12 +8,14 @@ import java.io.File;
 import src.main.gui.elements.MapElements;
 import src.main.gui.elements.MazeObject;
 
-public class GameGui extends JFrame implements ActionListener {
+// ANTES: public class GameGui extends JFrame implements ActionListener
+public class GameGui extends JFrame {
 
-    private final HighScore hs;
-    private int catFileName = 1;
+    final HighScore highScore; //se le quito el private
+    int catFileName = 1; //se le quito el private
     private final Container cp;
-    private final FileLoader fl = new FileLoader();
+    final FileLoader fl = new FileLoader(); //se le quito el private
+
     Action updateCursorAction = new AbstractAction() {
         public void actionPerformed(ActionEvent e) throws SlowAssPlayer //this inner class generates an exeption if the player takes to long to finish a level
         {
@@ -51,18 +53,24 @@ public class GameGui extends JFrame implements ActionListener {
     private MazeObject[][] labelMatrix;
     private JProgressBar progressBar;
     private JPanel newPanel;// = new JPanel();
-    private TheArchitect theArc = new TheArchitect();
+    TheArchitect theArc = new TheArchitect(); //se le quito el private
     private String[][] scrapMatrix;
-    private Timer timely;
-    private final TimeKeeper tk;
-    private String playerName;
-    private int levelNum = 1;
-    private File currentLevelDirectory;
+    Timer timely; //se le quito el private
+    final TimeKeeper timeKeeper; //se le quito el private
+    String playerName; //se le quito el private
+    int levelNum = 1; //se le quito el private
+    File currentLevelDirectory; //se le quito el private
+    private JLabel diamondsLabel;
+
     public GameGui() {
         super("Maze, a game of wondering"); //call super to initilize title bar of G.U.I.
         cp = getContentPane();
         shagLabel = new JLabel("", new ImageIcon("src/resources/assets/yeababyyea.jpg"), JLabel.LEFT);//GUI background for initial load
         cp.add(shagLabel);
+
+        // Creamos la instancia del nuevo controlador de menu
+        MenuController menuController = new MenuController(this);
+
         //Add Exit & New Game Menu Items
         JMenuItem itemExit = new JMenuItem("Exit");
         itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK));//press CTRL+X to exit if you want
@@ -75,18 +83,21 @@ public class GameGui extends JFrame implements ActionListener {
         JMenuItem newGameItem = new JMenuItem("New Game");
         JMenuItem openFileItem = new JMenuItem("Open Maze File.");
         openFileItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK));//press CTRL+O to open a level if you want
+
+        // Asignar los eventos al MenuController
         newGameItem.setActionCommand("New Game");
-        newGameItem.addActionListener(this);
+        newGameItem.addActionListener(menuController);
         itemEnterName.setActionCommand("EnterName");
-        itemEnterName.addActionListener(this);
+        itemEnterName.addActionListener(menuController);
         itemSaveScore.setActionCommand("SaveScore");
-        itemSaveScore.addActionListener(this);
+        itemSaveScore.addActionListener(menuController);
         itemHighScore.setActionCommand("src.main.HighScore");
-        itemHighScore.addActionListener(this);
+        itemHighScore.addActionListener(menuController);
         itemExit.setActionCommand("Exit");
-        itemExit.addActionListener(this);
+        itemExit.addActionListener(menuController);
         openFileItem.setActionCommand("Open");
-        openFileItem.addActionListener(this);
+        openFileItem.addActionListener(menuController);
+
         JMenu newMenu = new JMenu("File");
         newMenu.add(newGameItem);
         newMenu.add(itemEnterName);
@@ -103,8 +114,15 @@ public class GameGui extends JFrame implements ActionListener {
         setJMenuBar(menuBar);
         //Add Menu Bar
         newPanel = new JPanel();
-        hs = new HighScore();
-        tk = new TimeKeeper();
+        highScore = new HighScore();
+        timeKeeper = new TimeKeeper();
+
+        // Inicializacion del panel de diamantes
+        diamondsLabel = new JLabel("Total Diamonds Left to Collect: 0", JLabel.CENTER);
+        JPanel dimondsPanel = new JPanel();
+        dimondsPanel.add(diamondsLabel);
+        cp.add(dimondsPanel, BorderLayout.SOUTH);
+
         pack();
         setVisible(true);//show our menu bar and shagLabel.. Yea baby Yea! Whoa.. to much java.
     }//end constructor
@@ -113,88 +131,6 @@ public class GameGui extends JFrame implements ActionListener {
         new GameGui();
     }
 
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "Exit" -> {
-//exit on the menu bar
-
-                new Timer(1000, updateCursorAction).stop();
-                System.exit(0); //exit the system.
-            }
-            case "New Game" -> {
-                /**
-                 * Se implementó la funcionalidad para que al
-                 * presionar en "New game" te abra en automatico el nivel 1
-                 * */
-                // 1. Detener el temporizador previo si ya había una partida en curso
-                if (timely != null) {
-                    timely.stop();
-                }
-
-                // 2. Reiniciar los contadores de nivel y el estado del juego
-                levelNum = 1;
-                catFileName = 1;
-                theArc = new TheArchitect();
-
-                // 3. Cargar el nivel 1
-                File level1File = new File("src/resources/levels/level1.maz");
-                currentLevelDirectory = level1File.getParentFile();
-
-                if (level1File.exists() && fl.loadFile(level1File.getAbsolutePath())) {
-                    theArc.setExit(fl.ExitXCord(), fl.ExitYCord());
-                    loadMatrixGui(GuiEvents.NEW_LOAD);
-                } else {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "No se encontró el archivo del nivel 1 en:\n" + level1File.getAbsolutePath(),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
-
-            }
-            case "EnterName" -> {
-//Allows user to enter their name for high score
-
-                JOptionPane optionPane = new JOptionPane();
-                playerName = JOptionPane.showInputDialog("Please Enter your Earth Name");
-            }
-            case "src.main.HighScore" -> {
-//Displays the high scores
-
-                ScoreGui sg = new ScoreGui();
-                sg.ScoreGui();
-            }
-            case "SaveScore" ->
-//allows the user to save their score at any time.
-
-                    hs.addHighScore(playerName, tk.getMinutes(), tk.getSeconds(), levelNum);
-            case "Open" -> {
-                //to start the game you have to open a maze file. this is on the menu
-
-                JFileChooser chooser = new JFileChooser(".");
-                int returnVal = chooser.showOpenDialog(this);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = chooser.getSelectedFile();
-                    currentLevelDirectory = selectedFile.getParentFile();
-
-                    // Extraer el número de nivel desde el nombre (ej. "level5.maz" -> 5)
-                    String numericPart = selectedFile.getName().replaceAll("\\D+", "");
-                    if (!numericPart.isEmpty()) {
-                        levelNum = Integer.parseInt(numericPart);
-                    } else {
-                        levelNum = 1;
-                    }
-                    catFileName = levelNum;
-
-                    if (fl.loadFile(selectedFile.getAbsolutePath())) {//load the file we need using absolute path
-                        theArc.setExit(fl.ExitXCord(), fl.ExitYCord());
-                        loadMatrixGui(GuiEvents.NEW_LOAD);
-                    }
-                }
-            }
-        }
-    }//end actionPerformed method
 
     public void loadMatrixGui(GuiEvents event) {
         if (event == GuiEvents.NEW_LOAD) {
@@ -256,7 +192,7 @@ public class GameGui extends JFrame implements ActionListener {
     public void nextLevelLoad() {
         levelNum += 1;
         catFileName = levelNum;
-        tk.timeTracker(timeLeft, ix);//The src.main.TimeKeeper object keeps a running tab of the total time the player has used.(for high score)
+        timeKeeper.timeTracker(timeLeft, ix);//The src.main.TimeKeeper object keeps a running tab of the total time the player has used.(for high score)
         timely.stop();//dont count while we are loading the next level.
         theArc = new TheArchitect();//flush everything from src.main.TheArchitect so we dont get goffee results
 
@@ -270,11 +206,11 @@ public class GameGui extends JFrame implements ActionListener {
             loadMatrixGui(GuiEvents.NEW_LOAD);
         } else {
             // Fin de los niveles disponibles
-            hs.addHighScore(playerName, tk.getMinutes(), tk.getSeconds(), levelNum - 1);
+            highScore.addHighScore(playerName, timeKeeper.getMinutes(), timeKeeper.getSeconds(), levelNum - 1);
             JOptionPane.showMessageDialog(
                 this, 
                 "¡Felicidades! Has completado todos los laberintos.\nTiempo total: " 
-                + tk.getMinutes() + "m " + tk.getSeconds() + "s", 
+                + timeKeeper.getMinutes() + "m " + timeKeeper.getSeconds() + "s",
                 "¡Victoria!", 
                 JOptionPane.INFORMATION_MESSAGE
             );
@@ -320,17 +256,14 @@ public class GameGui extends JFrame implements ActionListener {
                     break;
                 }
             }//end switch
-            JLabel mainLabel = new JLabel("Total Dimonds Left to Collect" + theArc.getDimondsLeft(), JLabel.CENTER);//show how many dimonds are left to collect on the gui!
-            JPanel dimondsPanel = new JPanel();
-            dimondsPanel.add(mainLabel);
-            cp.add(dimondsPanel, BorderLayout.SOUTH);
+            diamondsLabel.setText("Total Diamonds Left to Collect: " + theArc.getDimondsLeft());
         }//end method
     }//end inner class
 
     private class SlowAssPlayer extends RuntimeException {
         public SlowAssPlayer(String event) {
             //the game is over, here we must tell our high score method to recond the details.
-            hs.addHighScore(playerName, tk.getMinutes(), tk.getSeconds(), levelNum);
+            highScore.addHighScore(playerName, timeKeeper.getMinutes(), timeKeeper.getSeconds(), levelNum);
             JFrame frame = new JFrame("Warning");
             JOptionPane.showMessageDialog(frame, "You Stupid Ass, Did you eat to much for dinner?  Move Faster!");//the entire game has ended.
         }
